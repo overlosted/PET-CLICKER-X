@@ -757,11 +757,11 @@
         }
 
         .gift-btn.accept {
-            background: #d7f7e2;
+            background: transparent;
         }
 
         .gift-btn.decline {
-            background: #ffe1e1;
+            background: transparent;
         }
     </style>
 </head>
@@ -1001,12 +1001,12 @@
                     <div id="mailSendForm">
                         <div class="mail-field">
                             <label>Recipient Email</label>
-                            <input type="email" id="sendToEmail" class="mail-input" placeholder="np. maks@gmail.com">
+                            <input type="email" id="sendToEmail" class="mail-input" placeholder="example@gmail.com">
                         </div>
 
                         <div class="mail-tabs">
                             <button type="button" class="mail-tab active" id="tabItemBtn" onclick="switchSendTab('item')">Item</button>
-                            <button type="button" class="mail-tab" id="tabGemsBtn" onclick="switchSendTab('gems')">💎 Gems</button>
+                            <button type="button" class="mail-tab" id="tabGemsBtn" onclick="switchSendTab('gems')">Gems</button>
                         </div>
 
                         <div id="sendItemTab">
@@ -1030,10 +1030,9 @@
                                 <label>💎 Gem Amount (max 1M)</label>
                                 <input type="text" id="sendGemsAmount" class="mail-input" value="0" onblur="normalizeGemsInput()">
                             </div>
-                            <div class="mail-owned-hint">Owned: <span id="sendGemsOwnedHint">0</span> 💎</div>
                         </div>
 
-                        <button class="buy-btn mail-send-btn" onclick="sendGift()">Send 🎁</button>
+                        <button class="buy-btn mail-send-btn" onclick="sendGift()">Send</button>
                         <div class="mail-status" id="sendStatus"></div>
                     </div>
                 </div>
@@ -1501,7 +1500,7 @@
         const itemSelect = document.getElementById('sendItemKey');
         if (!catSelect || !itemSelect) return;
         const items = getMailItemsForCategory(catSelect.value);
-        itemSelect.innerHTML = items.map(it => `<option value="${it.key}">${it.icon} ${it.name} (masz: ${formatNumber(it.owned)})</option>`).join('');
+        itemSelect.innerHTML = items.map(it => `<option value="${it.key}">${it.icon} ${it.name}</option>`).join('');
         updateSendOwnedHint();
     }
 
@@ -1866,8 +1865,6 @@
             document.getElementById(`buy${key.charAt(0).toUpperCase() + key.slice(1)}`).disabled = (state.clicks < cost) || isEggCooldown;
         }
 
-        const gemsOwnedHint = document.getElementById('sendGemsOwnedHint');
-        if (gemsOwnedHint) gemsOwnedHint.textContent = formatNumber(state.gems);
         if (document.getElementById('sendItemKey')) window.updateSendOwnedHint();
 
         const popBtn = document.getElementById('popupsToggleBtn');

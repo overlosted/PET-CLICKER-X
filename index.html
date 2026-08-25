@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET CLICKER X</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #7c3aed;
+            background-image: radial-gradient(#a78bfa 3px, transparent 3px);
+            background-size: 28px 28px;
+            font-family: 'Quicksand', sans-serif;
+            color: #1e293b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .hatch-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px) scale(0.8);
+            background: #ffffff;
+            color: #1e293b;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 18px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            z-index: 2000;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .hatch-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 440px;
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-panel {
+            background: #f1f0ff;
+            border-radius: 18px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: #2c2c54;
+        }
+
+        .auth-btn {
+            background: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #2b6cb0;
+            transition: transform 0.05s;
+        }
+
+        .auth-btn.logout {
+            background: #ff4757;
+            box-shadow: 0 3px 0 #b33939;
+        }
+
+        .auth-btn:active {
+            transform: translateY(2px);
+        }
+
+        .click-area {
+            background: #fff9db;
+            border-radius: 22px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(255, 218, 121, 0.4), inset 0 1px 0 rgba(255,255,255,0.7);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .currency-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .gems-display {
+            font-family: 'Fredoka One', cursive;
+            font-size: 20px;
+            color: #20c7f9;
+            background: #ffffff;
+            padding: 6px 18px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(112, 111, 211, 0.25);
+        }
+
+        .clicks-display {
+            font-family: 'Fredoka One', cursive;
+            font-size: 34px;
+            color: #ff9f1a;
+            background: #ffffff;
+            padding: 8px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(255, 159, 26, 0.3);
+        }
+
+        .click-btn {
+            font-size: 90px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            transition: transform 0.08s ease;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        .click-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .click-btn:active {
+            transform: scale(0.85);
+        }
+
+        .click-popup {
+            position: absolute;
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            color: #ff9f1a;
+            pointer-events: none;
+            animation: floatUp 0.7s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
+        }
+
+        .panel {
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.09), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.15s ease;
+        }
+
+        .panel-header {
+            color: white;
+            padding: 14px 18px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -6px 10px -6px rgba(0, 0, 0, 0.18);
+            transition: filter 0.15s ease;
+        }
+
+        .panel-header:hover {
+            filter: brightness(1.06);
+        }
+
+        .panel-header:active {
+            filter: brightness(0.96);
+        }
+
+        .panel-header > span:last-child {
+            font-size: 26px;
+            opacity: 0.9;
+            transition: transform 0.2s ease;
+        }
+
+        .panel-stats .panel-header { background: #ff5252; }
+        .panel-stats { background: #ffebee; }
+
+        .panel-pets .panel-header { background: #ff793f; }
+        .panel-pets { background: #fff2df; }
+
+        .panel-eggs .panel-header { background: #ffb142; }
+        .panel-eggs { background: #fff8e7; }
+
+        .panel-hands .panel-header { background: #33d9b2; }
+        .panel-hands { background: #e6fffa; }
+
+        .panel-mastery .panel-header { background: #ff4081; }
+        .panel-mastery { background: #fce4ec; }
+
+        .panel-settings .panel-header { background: #706fd3; }
+        .panel-settings { background: #f1f0ff; }
+
+        .panel-limited .panel-header { background: #2980b9; }
+        .panel-limited { background: #eaf2f8; }
+
+        .panel-limited-hands .panel-header { background: #16a085; }
+        .panel-limited-hands { background: #ffffff; }
+
+        .panel-limited-pets .panel-header { background: #3498db; }
+        .panel-limited-pets { background: #ffffff; }
+
+        .panel-limited-eggs .panel-header { background: #00a8ff; }
+        .panel-limited-eggs { background: #ffffff; }
+
+        .panel-mailbox .panel-header { background: #27ae60; }
+        .panel-mailbox { background: #eafaf1; }
+
+        .panel-mailbox-send .panel-header { background: #2ecc71; }
+        .panel-mailbox-send { background: #ffffff; }
+
+        .panel-mailbox-gifts .panel-header { background: #f39c12; }
+        .panel-mailbox-gifts { background: #ffffff; }
+
+        .panel-content {
+            padding: 16px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: inset 0 6px 10px -8px rgba(0, 0, 0, 0.15);
+        }
+
+        .panel-content.hidden {
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 12px 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.02);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.09);
+        }
+
+        .stat-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-family: 'Fredoka One', cursive;
+            font-size: 19px;
+            color: #ff5252;
+            margin-top: 2px;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.02);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-icon {
+            font-size: 34px;
+            background: #f7f1e3;
+            border: 2px solid #f0e4c8;
+            border-radius: 14px;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 3px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .item-name {
+            font-weight: 700;
+            font-size: 17px;
+            color: #2c2c54;
+        }
+
+        .item-desc {
+            font-size: 12px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .item-subtext {
+            font-size: 13px;
+            color: #ff9f1a;
+            font-weight: 700;
+        }
+
+        .item-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .item-owned {
+            font-size: 12px;
+            color: #474787;
+            font-weight: 700;
+            background: #f1f0ff;
+            padding: 3px 9px;
+            border-radius: 20px;
+            border: 1px solid rgba(71, 71, 135, 0.12);
+        }
+
+        .item-cost {
+            font-size: 12px;
+            color: #b5750a;
+            font-weight: 700;
+            background: #fff1d6;
+            padding: 3px 9px;
+            border-radius: 20px;
+            border: 1px solid rgba(181, 117, 10, 0.15);
+        }
+
+        .mastery-icon-container {
+            position: relative;
+            cursor: pointer;
+            width: 65px;
+            height: 65px;
+            background: #fff;
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.15s ease;
+        }
+
+        .mastery-icon-container:hover {
+            transform: translateY(-2px);
+        }
+
+        .mastery-emoji {
+            font-size: 38px;
+        }
+
+        .mastery-level-badge {
+            position: absolute;
+            bottom: 2px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 12px;
+            color: #ff4081;
+            background: none;
+            padding: 1px 6px;
+            box-shadow: none;
+        }
+
+        .egg-mastery-level-badge {
+            color: #ff4081 !important;
+        }
+
+        .mastery-tooltip {
+            position: fixed;
+            display: none;
+            background: #2c2c54;
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            line-height: 1.5;
+        }
+
+        .mastery-tooltip .tt-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 16px;
+            color: #ff9f1a;
+            margin-bottom: 2px;
+        }
+
+        .mastery-tooltip .tt-level {
+            font-family: 'Fredoka One', cursive;
+            color: #ff4081;
+            margin-bottom: 6px;
+        }
+
+        .pink-text {
+            color: #ff4081;
+        }
+
+        .buy-btn {
+            background: #2ed573;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 22px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 17px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #26af5f;
+            transition: transform 0.05s, box-shadow 0.05s, background-color 0.1s;
+        }
+
+        .buy-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #26af5f;
+        }
+
+        .buy-btn:disabled {
+            background: #d1d8e0;
+            box-shadow: 0 4px 0 #a5b1c2;
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            padding: 4px 0;
+            color: #2c2c54;
+        }
+
+        .toggle-btn {
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 18px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .toggle-btn.on {
+            background: #2ed573;
+            box-shadow: 0 3px 0 #26af5f;
+        }
+
+        .toggle-btn.off {
+            background: #ff4757;
+            box-shadow: 0 3px 0 #b33939;
+        }
+
+        .reset-btn {
+            background: #ff5252;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #b33939;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .reset-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b33939;
+        }
+
+        input[type="range"] {
+            accent-color: #706fd3;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .mail-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .mail-field label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .mail-input, .mail-select {
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            color: #2c2c54;
+            background: #f7f7fb;
+            outline: none;
+            width: 100%;
+        }
+
+        .mail-input:focus, .mail-select:focus {
+            border-color: #27ae60;
+        }
+
+        .mail-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mail-tab {
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            padding: 10px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 13px;
+            cursor: pointer;
+            background: #f1f0ff;
+            color: #706fd3;
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .mail-tab.active {
+            background: #27ae60;
+            color: white;
+        }
+
+        .mail-qty-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .mail-qty-row label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .mail-qty-row input {
+            width: 70px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            padding: 8px 10px;
+            font-weight: 700;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .mail-owned-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: 700;
+        }
+
+        .mail-send-btn {
+            width: 100%;
+        }
+
+        .mail-status {
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            min-height: 18px;
+            margin-top: 8px;
+        }
+
+        .mail-status.success {
+            color: #2ed573;
+        }
+
+        .mail-status.error {
+            color: #ff5252;
+        }
+
+        .mail-locked {
+            text-align: center;
+            font-weight: 700;
+            color: #888;
+            padding: 14px 0;
+        }
+
+        .gift-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .gift-empty {
+            text-align: center;
+            font-weight: 700;
+            color: #aaa;
+            padding: 10px 0;
+        }
+
+        .gift-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.02);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .gift-collapsed {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+        }
+
+        .gift-box-icon {
+            font-size: 26px;
+        }
+
+        .gift-hint {
+            font-weight: 700;
+            color: #2c2c54;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .gift-expanded {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 14px 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .gift-item-icon {
+            font-family: 'Fredoka One', cursive;
+            font-size: 32px;
+            color: #2c2c54;
+        }
+
+        .gift-item-icon.gems-icon {
+            font-size: 19px;
+            color: #20c7f9;
+        }
+
+        .gift-from {
+            font-size: 13px;
+            font-weight: 700;
+            color: #888;
+        }
+
+        .gift-actions {
+            display: flex;
+            gap: 14px;
+            margin-top: 4px;
+        }
+
+        .gift-btn {
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 19px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.05s;
+        }
+
+        .gift-btn:active {
+            transform: scale(0.9);
+        }
+
+        .gift-btn.accept {
+            background: #d7f7e2;
+        }
+
+        .gift-btn.decline {
+            background: #ffe1e1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hatch-notification" id="hatchNotification">
+    🎉 You Hatched: <span id="hatchPetName">🐶 Dog</span>
+</div>
+
+<div class="game-container">
+    <div class="auth-panel">
+        <div class="user-info" id="userInfo">
+            <span class="user-name">Play as Guest</span>
+        </div>
+        <button class="auth-btn" id="authBtn">Log in with Google</button>
+    </div>
+
+    <div class="click-area" id="clickArea">
+        <div class="currency-row">
+            <div class="gems-display">💎: <span id="gems">0</span></div>
+            <div class="clicks-display">👆: <span id="clicks">0</span></div>
+        </div>
+        <button class="click-btn" id="mainClickBtn">👆</button>
+    </div>
+
+    <div class="panel panel-stats">
+        <div class="panel-header" onclick="togglePanel('statsContent', 'statsArrow')">
+            <span>Stats</span>
+            <span id="statsArrow">⬇️</span>
+        </div>
+        <div class="panel-content" id="statsContent">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Per Click</div>
+                    <div class="stat-value" id="statPerClick">1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Per Sec</div>
+                    <div class="stat-value" id="statPerSec">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Pets Owned</div>
+                    <div class="stat-value" id="statPetsOwned">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-pets">
+        <div class="panel-header" onclick="togglePanel('petsContent', 'petsArrow')">
+            <span>Pets</span>
+            <span id="petsArrow">⬇️</span>
+        </div>
+        <div class="panel-content" id="petsContent">
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-icon">😺</div>
+                    <div class="item-details">
+                        <div class="item-name">Cat</div>
+                        <div class="item-subtext">👆 1/s</div>
+                        <div class="item-meta">
+                            <div class="item-owned">Owned: <span id="catOwned">0</span></div>
+                            <div class="item-cost">Cost 👆 <span id="catCost">15</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="buy-btn" id="buyCat" onclick="buyPet('cat')">Buy</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-icon">🐶</div>
+                    <div class="item-details">
+                        <div class="item-name">Dog</div>
+                        <div class="item-subtext">👆 5/s</div>
+                        <div class="item-meta">
+                            <div class="item-owned">Owned: <span id="dogOwned">0</span></div>
+                            <div class="item-cost">Cost 👆 <span id="dogCost">100</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="buy-btn" id="buyDog" onclick="buyPet('dog')">Buy</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-icon">🐰</div>
+                    <div class="item-details">
+                        <div class="item-name">Bunny</div>
+                        <div class="item-subtext">👆 20/s</div>
+                        <div class="item-meta">
+                            <div class="item-owned">Owned: <span id="bunnyOwned">0</span></div>
+                            <div class="item-cost">Cost 👆 <span id="bunnyCost">500</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="buy-btn" id="buyBunny" onclick="buyPet('bunny')">Buy</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-icon">🦊</div>
+                    <div class="item-details">
+                        <div class="item-name">Fox</div>
+                        <div class="item-subtext">👆 100/s</div>
+                        <div class="item-meta">
+                            <div class="item-owned">Owned: <span id="foxOwned">0</span></div>
+                            <div class="item-cost">Cost 👆 <span id="foxCost">2.5K</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="buy-btn" id="buyFox" onclick="buyPet('fox')">Buy</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-icon">🐲</div>
+                    <div class="item-details">
+                        <div class="item-name">Dragon</div>
+                        <div class="item-desc">Obtained From Basic Egg</div>
+                        <div class="item-subtext">👆 500/s</div>
+                        <div class="item-meta">
+                            <div class="item-owned">Owned: <span id="dragonOwned">0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-eggs">
+        <div class="panel-header" onclick="togglePanel('eggsContent', 'eggsArrow')">
+            <span>Eggs</span>
+            <span id="eggsArrow">⬇️</span>
+        </div>
+        <div class="panel-content" id="eggsContent">
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-icon">🥚</div>
+                    <div class="item-details">
+                        <div class="item-name">Basic Egg</div>
+                        <div class="item-desc">Cat, Dog, Bunny, Fox, Dragon</div>
+                        <div class="item-meta">
+                            <div class="item-owned">Hatched: <span id="basicEggHatched">0</span></div>
+                            <div class="item-cost">Cost 👆 <span id="basicEggCost">1K</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="buy-btn" id="buyBasicEgg" onclick="buyEgg('basicEgg')">Buy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-hands">
+        <div class="panel-header" onclick="togglePanel('handsContent', 'handsArrow')">
+            <span>Hands</span>
+            <span id="handsArrow">⬇️</span>
+        </div>
+        <div class="panel-content" id="handsContent">
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-icon">👆</div>
+                    <div class="item-details">
+                        <div class="item-name">Hand</div>
+                        <div class="item-subtext">+1 👆 Power</div>
+                        <div class="item-meta">
+                            <div class="item-owned">Owned: <span id="handOwned">0</span></div>
+                            <div class="item-cost">Cost 👆 <span id="handCost">10</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="buy-btn" id="buyHand" onclick="buyHand()">Buy</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-icon">🐉</div>
+                    <div class="item-details">
+                        <div class="item-name">Dragon Hand</div>
+                        <div class="item-subtext">+5 👆 Power</div>
+                        <div class="item-meta">
+                            <div class="item-owned">Owned: <span id="dragonHandOwned">0</span></div>
+                            <div class="item-cost">Cost 👆 <span id="dragonHandCost">200</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="buy-btn" id="buyDragonHand" onclick="buyDragonHand()">Buy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-mastery">
+        <div class="panel-header" onclick="togglePanel('masteryContent', 'masteryArrow')">
+            <span>Mastery</span>
+            <span id="masteryArrow">⬇️</span>
+        </div>
+        <div class="panel-content" id="masteryContent">
+            <div style="display: flex; justify-content: center; gap: 20px; padding: 6px 0;">
+                <div class="mastery-icon-container" id="masteryIcon">
+                    <span class="mastery-emoji">👆</span>
+                    <span class="mastery-level-badge" id="masteryBadge">Lvl 0</span>
+                </div>
+                <div class="mastery-icon-container" id="eggMasteryIcon">
+                    <span class="mastery-emoji">🥚</span>
+                    <span class="mastery-level-badge egg-mastery-level-badge" id="eggMasteryBadge">Lvl 0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-settings">
+        <div class="panel-header" onclick="togglePanel('settingsContent', 'settingsArrow')">
+            <span>Settings</span>
+            <span id="settingsArrow">⬇️</span>
+        </div>
+        <div class="panel-content" id="settingsContent">
+            <div class="setting-row">
+                <span>Sound Volume</span>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8" onchange="updateVolume(this.value)">
+            </div>
+            <div class="setting-row">
+                <span>Popups</span>
+                <button class="toggle-btn on" id="popupsToggleBtn" onclick="togglePopups()">ON</button>
+            </div>
+            <button class="reset-btn" onclick="resetData()">Reset Progress</button>
+        </div>
+    </div>
+
+    <div class="panel panel-mailbox">
+        <div class="panel-header" onclick="togglePanel('mailboxContent', 'mailboxArrow')">
+            <span>Mailbox</span>
+            <span id="mailboxArrow">⬇️</span>
+        </div>
+        <div class="panel-content" id="mailboxContent">
+            <div class="panel panel-mailbox-send">
+                <div class="panel-header" onclick="togglePanel('sendContent', 'sendArrow')">
+                    <span>Send</span>
+                    <span id="sendArrow">⬇️</span>
+                </div>
+                <div class="panel-content" id="sendContent">
+                    <div class="mail-locked hidden" id="mailLockedSend">Log in to send gifts 📪</div>
+                    <div id="mailSendForm">
+                        <div class="mail-field">
+                            <label>Recipient Email</label>
+                            <input type="email" id="sendToEmail" class="mail-input" placeholder="np. maks@gmail.com">
+                        </div>
+
+                        <div class="mail-tabs">
+                            <button type="button" class="mail-tab active" id="tabItemBtn" onclick="switchSendTab('item')">Item</button>
+                            <button type="button" class="mail-tab" id="tabGemsBtn" onclick="switchSendTab('gems')">💎 Gems</button>
+                        </div>
+
+                        <div id="sendItemTab">
+                            <div class="mail-field">
+                                <label>Category</label>
+                                <select id="sendCategory" class="mail-select" onchange="updateSendItemOptions()"></select>
+                            </div>
+                            <div class="mail-field">
+                                <label>Item</label>
+                                <select id="sendItemKey" class="mail-select" onchange="updateSendOwnedHint()"></select>
+                            </div>
+                            <div class="mail-qty-row">
+                                <label>Quantity</label>
+                                <input type="number" id="sendQty" min="1" value="1" onchange="updateSendOwnedHint()">
+                                <span class="mail-owned-hint" id="sendItemOwnedHint">Owned: 0</span>
+                            </div>
+                        </div>
+
+                        <div id="sendGemsTab" class="hidden">
+                            <div class="mail-field">
+                                <label>💎 Gem Amount (max 1M)</label>
+                                <input type="text" id="sendGemsAmount" class="mail-input" value="0" onblur="normalizeGemsInput()">
+                            </div>
+                            <div class="mail-owned-hint">Owned: <span id="sendGemsOwnedHint">0</span> 💎</div>
+                        </div>
+
+                        <button class="buy-btn mail-send-btn" onclick="sendGift()">Send 🎁</button>
+                        <div class="mail-status" id="sendStatus"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-mailbox-gifts">
+                <div class="panel-header" onclick="togglePanel('giftsContent', 'giftsArrow')">
+                    <span>Gifts</span>
+                    <span id="giftsArrow">⬇️</span>
+                </div>
+                <div class="panel-content" id="giftsContent">
+                    <div class="mail-locked hidden" id="mailLockedGifts">Log in to see gifts 📪</div>
+                    <div class="gift-list" id="giftList">
+                        <div class="gift-empty" id="giftEmptyMsg">No gifts 📭</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-limited">
+        <div class="panel-header" onclick="togglePanel('limitedContent', 'limitedArrow')">
+            <span>Limited</span>
+            <span id="limitedArrow">⬆️</span>
+        </div>
+        <div class="panel-content hidden" id="limitedContent">
+            <div class="panel panel-limited-hands">
+                <div class="panel-header" onclick="togglePanel('limitedHandsContent', 'limitedHandsArrow')">
+                    <span>Limited Hands</span>
+                    <span id="limitedHandsArrow">⬆️</span>
+                </div>
+                <div class="panel-content hidden" id="limitedHandsContent"></div>
+            </div>
+
+            <div class="panel panel-limited-pets">
+                <div class="panel-header" onclick="togglePanel('limitedPetsContent', 'limitedPetsArrow')">
+                    <span>Limited Pets</span>
+                    <span id="limitedPetsArrow">⬆️</span>
+                </div>
+                <div class="panel-content hidden" id="limitedPetsContent"></div>
+            </div>
+
+            <div class="panel panel-limited-eggs">
+                <div class="panel-header" onclick="togglePanel('limitedEggsContent', 'limitedEggsArrow')">
+                    <span>Limited Eggs</span>
+                    <span id="limitedEggsArrow">⬆️</span>
+                </div>
+                <div class="panel-content hidden" id="limitedEggsContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mastery-tooltip" id="masteryTooltip">
+    <div class="tt-title">Clicks Mastery</div>
+    <div class="tt-level" id="ttLevel">Level 0</div>
+    <div><span class="pink-text">25 Level</span>: 1.1x More Clicks</div>
+    <div><span class="pink-text">50 Level</span>: 1.3x More Clicks</div>
+    <div><span class="pink-text">75 Level</span>: 1.4x More Clicks</div>
+</div>
+
+<div class="mastery-tooltip" id="eggMasteryTooltip">
+    <div class="tt-title" style="color: #F6AA6C;">Eggs Mastery</div>
+    <div class="tt-level" id="eggTtLevel" style="color: #F6AA6C;">Level 0</div>
+    <div><span class="pink-text">25 Level</span>: 1.1x More Lucky Eggs</div>
+    <div><span class="pink-text">50 Level</span>: 1.2x More Lucky Eggs</div>
+    <div><span class="pink-text">75 Level</span>: 1.3x More Lucky Eggs</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBmvsWoscqxjF4onSmoBOcmfWKke4vwUGs",
+        authDomain: "pet-clicker-x.firebaseapp.com",
+        projectId: "pet-clicker-x",
+        storageBucket: "pet-clicker-x.firebasestorage.app",
+        messagingSenderId: "304390835934",
+        appId: "1:742722516890:web:ee65a3a265c4ee8ff8ac23",
+        measurementId: "G-CLXKQT9YLT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+
+    function getDefaultState() {
+        return {
+            clicks: 0,
+            gems: 0,
+            manualClicksCount: 0,
+            masteryLevel: 0,
+            eggMasteryLevel: 0,
+            eggProgress: 0,
+            handOwned: 0,
+            dragonHandOwned: 0,
+            pets: {
+                cat: { owned: 0, cps: 1 },
+                dog: { owned: 0, cps: 5 },
+                bunny: { owned: 0, cps: 20 },
+                fox: { owned: 0, cps: 100 },
+                dragon: { owned: 0, cps: 500 }
+            },
+            eggs: {
+                basicEgg: { hatched: 0 }
+            },
+            limitedPets: {},
+            limitedHands: {},
+            volume: 0.8,
+            popupsEnabled: true
+        };
+    }
+
+    let state = getDefaultState();
+    let isEggCooldown = false;
+
+    function formatNumber(num) {
+        if (num < 1000) return (Math.round(num * 10) / 10).toString();
+        const suffixes = ["", "K", "M", "B", "T"];
+        const i = Math.floor(Math.log10(num) / 3);
+        if (i >= suffixes.length) return num.toExponential(1);
+        const formatted = (num / Math.pow(10, i * 3)).toFixed(1);
+        return formatted.endsWith('.0') ? Math.floor(num / Math.pow(10, i * 3)) + suffixes[i] : formatted + suffixes[i];
+    }
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) audioCtx = new AudioContext();
+    }
+
+    function playSound(type) {
+        if (!audioCtx || state.volume <= 0) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(500, now);
+            osc.frequency.exponentialRampToValueAtTime(1000, now + 0.07);
+            gain.gain.setValueAtTime(state.volume * 0.9, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+            osc.start(now);
+            osc.stop(now + 0.07);
+        } else if (type === 'buy') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(850, now + 0.14);
+            gain.gain.setValueAtTime(state.volume * 1.0, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+            osc.start(now);
+            osc.stop(now + 0.14);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.linearRampToValueAtTime(140, now + 0.14);
+            gain.gain.setValueAtTime(state.volume * 0.7, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+            osc.start(now);
+            osc.stop(now + 0.14);
+        }
+    }
+
+    function getRequiredClicksForLevel(level) {
+        if (level <= 0) return 0;
+        if (level <= 25) return 100;
+        if (level <= 50) return 250;
+        return 500;
+    }
+
+    function checkMasteryProgress() {
+        if (state.masteryLevel >= 75) return;
+        let req = getRequiredClicksForLevel(state.masteryLevel + 1);
+        while (state.manualClicksCount >= req && state.masteryLevel < 75) {
+            state.manualClicksCount -= req;
+            state.masteryLevel++;
+            if (state.masteryLevel < 75) req = getRequiredClicksForLevel(state.masteryLevel + 1);
+        }
+    }
+
+    function checkEggMasteryProgress() {
+        if (state.eggMasteryLevel >= 75) return;
+        state.eggProgress++;
+        let requiredEggs = state.eggMasteryLevel >= 50 ? 3 : (state.eggMasteryLevel >= 25 ? 2 : 1);
+        while (state.eggProgress >= requiredEggs && state.eggMasteryLevel < 75) {
+            state.eggProgress -= requiredEggs;
+            state.eggMasteryLevel++;
+            requiredEggs = state.eggMasteryLevel >= 50 ? 3 : (state.eggMasteryLevel >= 25 ? 2 : 1);
+        }
+    }
+
+    function getMasteryMultiplier() {
+        if (state.masteryLevel >= 75) return 1.40;
+        if (state.masteryLevel >= 50) return 1.30;
+        if (state.masteryLevel >= 25) return 1.10;
+        return 1.0;
+    }
+
+    function getDragonChance() {
+        if (state.eggMasteryLevel >= 75) return 0.04;
+        if (state.eggMasteryLevel >= 50) return 0.03;
+        if (state.eggMasteryLevel >= 25) return 0.02;
+        return 0.01;
+    }
+
+    function getClickPower() {
+        return (1 + (state.handOwned * 1) + (state.dragonHandOwned * 5)) * getMasteryMultiplier();
+    }
+
+    function getHandCost() {
+        return Math.floor(10 * Math.pow(1.5, state.handOwned));
+    }
+
+    function getDragonHandCost() {
+        return Math.floor(200 * Math.pow(1.5, state.dragonHandOwned));
+    }
+
+    function getPetCost(petKey) {
+        const baseCost = { cat: 15, dog: 100, bunny: 500, fox: 2500 }[petKey];
+        if (!baseCost) return 0;
+        return Math.floor(baseCost * Math.pow(1.15, state.pets[petKey].owned));
+    }
+
+    function getEggCost(eggKey) {
+        const baseCost = { basicEgg: 1000 }[eggKey];
+        if (!baseCost) return 0;
+        return Math.floor(baseCost * Math.pow(1.15, state.eggs[eggKey].hatched));
+    }
+
+    function getTotalCps() {
+        let baseCps = 0;
+        for (let key in state.pets) {
+            baseCps += state.pets[key].owned * state.pets[key].cps;
+        }
+        return baseCps * getMasteryMultiplier();
+    }
+
+    function getTotalPetsOwned() {
+        let total = 0;
+        for (let key in state.pets) total += state.pets[key].owned;
+        return total;
+    }
+
+    function createPopup(e, text) {
+        if (!state.popupsEnabled) return;
+        const popup = document.createElement('div');
+        popup.className = 'click-popup';
+        popup.textContent = `+${formatNumber(text)}`;
+        const rect = document.getElementById('clickArea').getBoundingClientRect();
+        let x = e.clientX ? (e.clientX - rect.left) : (rect.width / 2);
+        let y = e.clientY ? (e.clientY - rect.top) : (rect.height / 2);
+        x += (Math.random() * 40 - 20);
+        popup.style.left = `${x}px`;
+        popup.style.top = `${y}px`;
+        document.getElementById('clickArea').appendChild(popup);
+        setTimeout(() => popup.remove(), 700);
+    }
+
+    window.togglePanel = function(contentId, arrowId) {
+        const content = document.getElementById(contentId);
+        const arrow = document.getElementById(arrowId);
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            arrow.textContent = '⬇️';
+        } else {
+            content.classList.add('hidden');
+            arrow.textContent = '⬆️';
+        }
+    };
+
+    window.updateVolume = function(val) {
+        state.volume = parseFloat(val);
+        saveData();
+    };
+
+    window.togglePopups = function() {
+        state.popupsEnabled = !state.popupsEnabled;
+        saveData();
+        updateUI();
+    };
+
+    window.buyHand = function() {
+        initAudio();
+        const cost = getHandCost();
+        if (state.clicks >= cost) {
+            state.clicks -= cost;
+            state.handOwned++;
+            playSound('buy');
+            saveData();
+        } else {
+            playSound('error');
+        }
+        updateUI();
+    };
+
+    window.buyDragonHand = function() {
+        initAudio();
+        const cost = getDragonHandCost();
+        if (state.clicks >= cost) {
+            state.clicks -= cost;
+            state.dragonHandOwned++;
+            playSound('buy');
+            saveData();
+        } else {
+            playSound('error');
+        }
+        updateUI();
+    };
+
+    window.buyPet = function(petKey) {
+        initAudio();
+        const cost = getPetCost(petKey);
+        if (state.clicks >= cost) {
+            state.clicks -= cost;
+            state.pets[petKey].owned++;
+            playSound('buy');
+            saveData();
+        } else {
+            playSound('error');
+        }
+        updateUI();
+    };
+
+    window.buyEgg = function(eggKey) {
+        if (isEggCooldown) return;
+        initAudio();
+        const cost = getEggCost(eggKey);
+
+        if (state.clicks >= cost) {
+            state.clicks -= cost;
+            state.eggs[eggKey].hatched++;
+            checkEggMasteryProgress();
+
+            const dragonChance = getDragonChance();
+            const rand = Math.random() * 100;
+            let hatchedPet = 'cat';
+            let petDisplay = '😺 Cat';
+
+            if (rand < dragonChance) {
+                hatchedPet = 'dragon';
+                petDisplay = '🐲 Dragon';
+            } else {
+                const remainingRand = Math.random() * 99.99;
+                if (remainingRand < 40) {
+                    hatchedPet = 'cat';
+                    petDisplay = '😺 Cat';
+                } else if (remainingRand < 70) {
+                    hatchedPet = 'dog';
+                    petDisplay = '🐶 Dog';
+                } else if (remainingRand < 95) {
+                    hatchedPet = 'bunny';
+                    petDisplay = '🐰 Bunny';
+                } else {
+                    hatchedPet = 'fox';
+                    petDisplay = '🦊 Fox';
+                }
+            }
+
+            state.pets[hatchedPet].owned++;
+            playSound('buy');
+            saveData();
+            showHatchNotification(petDisplay);
+
+            isEggCooldown = true;
+            updateUI();
+            setTimeout(() => {
+                isEggCooldown = false;
+                updateUI();
+            }, 1000);
+        } else {
+            playSound('error');
+        }
+        updateUI();
+    };
+
+    window.resetData = async function() {
+        if (confirm("Are you sure you want to reset all your progress?")) {
+            state = getDefaultState();
+            if (currentUser) {
+                try {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    await setDoc(userRef, { state });
+                } catch (e) {
+                    console.error("Firestore Reset Error:", e);
+                }
+            }
+            updateUI();
+        }
+    };
+
+    function showHatchNotification(petDisplay) {
+        const notif = document.getElementById('hatchNotification');
+        document.getElementById('hatchPetName').textContent = petDisplay;
+        notif.classList.add('show');
+        setTimeout(() => notif.classList.remove('show'), 1000);
+    }
+
+    // ===================== MAILBOX =====================
+
+    const petIcons = { cat: '😺', dog: '🐶', bunny: '🐰', fox: '🦊', dragon: '🐲' };
+    const petNames = { cat: 'Cat', dog: 'Dog', bunny: 'Bunny', fox: 'Fox', dragon: 'Dragon' };
+    const handIcons = { hand: '👆', dragonHand: '🐉' };
+    const handNames = { hand: 'Hand', dragonHand: 'Dragon Hand' };
+
+    let giftsUnsub = null;
+    let giftsCache = {};
+
+    function parseAmountInput(str) {
+        if (str === null || str === undefined) return 0;
+        str = str.toString().trim().toUpperCase().replace(',', '.');
+        if (str === '') return 0;
+        const match = str.match(/^([\d.]+)\s*([KMBT]?)$/);
+        if (!match) return NaN;
+        let num = parseFloat(match[1]);
+        if (isNaN(num)) return NaN;
+        const mult = { K: 1e3, M: 1e6, B: 1e9, T: 1e12 }[match[2]] || 1;
+        return Math.floor(num * mult);
+    }
+
+    function getMailCategories() {
+        const cats = [{ value: 'pet', label: 'Pet' }, { value: 'hand', label: 'Hand' }];
+        if (Object.keys(state.limitedPets || {}).length > 0) cats.push({ value: 'limitedPet', label: 'Limited Pet' });
+        if (Object.keys(state.limitedHands || {}).length > 0) cats.push({ value: 'limitedHand', label: 'Limited Hand' });
+        return cats;
+    }
+
+    function getMailItemsForCategory(cat) {
+        if (cat === 'pet') {
+            return Object.keys(state.pets).map(k => ({ key: k, name: petNames[k] || k, icon: petIcons[k] || '🐾', owned: state.pets[k].owned }));
+        }
+        if (cat === 'hand') {
+            return [
+                { key: 'hand', name: handNames.hand, icon: handIcons.hand, owned: state.handOwned },
+                { key: 'dragonHand', name: handNames.dragonHand, icon: handIcons.dragonHand, owned: state.dragonHandOwned }
+            ];
+        }
+        if (cat === 'limitedPet') {
+            return Object.keys(state.limitedPets || {}).map(k => ({ key: k, name: state.limitedPets[k].name || k, icon: state.limitedPets[k].icon || '🐾', owned: state.limitedPets[k].owned || 0 }));
+        }
+        if (cat === 'limitedHand') {
+            return Object.keys(state.limitedHands || {}).map(k => ({ key: k, name: state.limitedHands[k].name || k, icon: state.limitedHands[k].icon || '👆', owned: state.limitedHands[k].owned || 0 }));
+        }
+        return [];
+    }
+
+    function buildSendCategoryOptions() {
+        const catSelect = document.getElementById('sendCategory');
+        if (!catSelect) return;
+        const cats = getMailCategories();
+        catSelect.innerHTML = cats.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+        buildSendItemOptions();
+    }
+
+    function buildSendItemOptions() {
+        const catSelect = document.getElementById('sendCategory');
+        const itemSelect = document.getElementById('sendItemKey');
+        if (!catSelect || !itemSelect) return;
+        const items = getMailItemsForCategory(catSelect.value);
+        itemSelect.innerHTML = items.map(it => `<option value="${it.key}">${it.icon} ${it.name} (masz: ${formatNumber(it.owned)})</option>`).join('');
+        updateSendOwnedHint();
+    }
+
+    window.updateSendItemOptions = function() {
+        buildSendItemOptions();
+    };
+
+    window.updateSendOwnedHint = function() {
+        const catSelect = document.getElementById('sendCategory');
+        const itemSelect = document.getElementById('sendItemKey');
+        const hint = document.getElementById('sendItemOwnedHint');
+        if (!catSelect || !itemSelect || !hint) return;
+        const items = getMailItemsForCategory(catSelect.value);
+        const chosen = items.find(it => it.key === itemSelect.value);
+        hint.textContent = `Owned: ${chosen ? formatNumber(chosen.owned) : 0}`;
+    };
+
+    window.switchSendTab = function(tab) {
+        const itemTab = document.getElementById('sendItemTab');
+        const gemsTab = document.getElementById('sendGemsTab');
+        const itemBtn = document.getElementById('tabItemBtn');
+        const gemsBtn = document.getElementById('tabGemsBtn');
+        if (tab === 'item') {
+            itemTab.classList.remove('hidden');
+            gemsTab.classList.add('hidden');
+            itemBtn.classList.add('active');
+            gemsBtn.classList.remove('active');
+        } else {
+            itemTab.classList.add('hidden');
+            gemsTab.classList.remove('hidden');
+            gemsBtn.classList.add('active');
+            itemBtn.classList.remove('active');
+        }
+        const statusEl = document.getElementById('sendStatus');
+        if (statusEl) { statusEl.textContent = ''; statusEl.className = 'mail-status'; }
+    };
+
+    window.normalizeGemsInput = function() {
+        const input = document.getElementById('sendGemsAmount');
+        let amount = parseAmountInput(input.value);
+        if (isNaN(amount) || amount < 0) amount = 0;
+        if (amount > 1000000) amount = 1000000;
+        input.value = formatNumber(amount);
+    };
+
+    window.sendGift = async function() {
+        const statusEl = document.getElementById('sendStatus');
+        statusEl.className = 'mail-status';
+        statusEl.textContent = '';
+
+        if (!currentUser) {
+            statusEl.textContent = 'Log in to send gifts.';
+            statusEl.classList.add('error');
+            return;
+        }
+
+        const toEmailRaw = document.getElementById('sendToEmail').value.trim();
+        const toEmail = toEmailRaw.toLowerCase();
+        if (!toEmail || !toEmail.includes('@')) {
+            statusEl.textContent = 'Enter a valid recipient email.';
+            statusEl.classList.add('error');
+            return;
+        }
+        if (toEmail === (currentUser.email || '').toLowerCase()) {
+            statusEl.textContent = 'You can\'t send a gift to yourself.';
+            statusEl.classList.add('error');
+            return;
+        }
+
+        const activeIsGems = !document.getElementById('sendGemsTab').classList.contains('hidden');
+        let giftType, giftKey, giftAmount;
+
+        if (activeIsGems) {
+            const amount = parseAmountInput(document.getElementById('sendGemsAmount').value);
+            if (isNaN(amount) || amount <= 0) {
+                statusEl.textContent = 'Enter a valid gem amount.';
+                statusEl.classList.add('error');
+                return;
+            }
+            if (amount > 1000000) {
+                statusEl.textContent = 'You can send a maximum of 1M gems.';
+                statusEl.classList.add('error');
+                return;
+            }
+            if (state.gems < amount) {
+                statusEl.textContent = 'You don\'t have that many gems.';
+                statusEl.classList.add('error');
+                return;
+            }
+            giftType = 'gems';
+            giftKey = null;
+            giftAmount = amount;
+        } else {
+            const category = document.getElementById('sendCategory').value;
+            const key = document.getElementById('sendItemKey').value;
+            const qty = parseInt(document.getElementById('sendQty').value, 10);
+            if (!key || !qty || qty <= 0) {
+                statusEl.textContent = 'Choose an item and quantity.';
+                statusEl.classList.add('error');
+                return;
+            }
+            const items = getMailItemsForCategory(category);
+            const chosen = items.find(it => it.key === key);
+            if (!chosen || chosen.owned < qty) {
+                statusEl.textContent = 'You don\'t have that many of this item.';
+                statusEl.classList.add('error');
+                return;
+            }
+            giftType = category;
+            giftKey = key;
+            giftAmount = qty;
+        }
+
+        try {
+            const emailDoc = await getDoc(doc(db, 'usersByEmail', toEmail));
+            if (!emailDoc.exists()) {
+                statusEl.textContent = 'No player found with that email address.';
+                statusEl.classList.add('error');
+                playSound('error');
+                return;
+            }
+            const recipientUid = emailDoc.data().uid;
+
+            if (giftType === 'gems') {
+                state.gems -= giftAmount;
+            } else if (giftType === 'pet') {
+                state.pets[giftKey].owned -= giftAmount;
+            } else if (giftType === 'hand') {
+                if (giftKey === 'hand') state.handOwned -= giftAmount;
+                else if (giftKey === 'dragonHand') state.dragonHandOwned -= giftAmount;
+            } else if (giftType === 'limitedPet') {
+                state.limitedPets[giftKey].owned -= giftAmount;
+            } else if (giftType === 'limitedHand') {
+                state.limitedHands[giftKey].owned -= giftAmount;
+            }
+            updateUI();
+            saveData();
+
+            await addDoc(collection(db, 'mailbox', recipientUid, 'gifts'), {
+                from: currentUser.email || 'Nieznajomy',
+                type: giftType,
+                key: giftKey,
+                amount: giftAmount,
+                returned: false,
+                timestamp: serverTimestamp()
+            });
+
+            playSound('buy');
+            statusEl.textContent = 'Gift sent! 🎉';
+            statusEl.classList.add('success');
+            document.getElementById('sendToEmail').value = '';
+            document.getElementById('sendGemsAmount').value = '0';
+            document.getElementById('sendQty').value = '1';
+            buildSendItemOptions();
+        } catch (e) {
+            console.error('Send Gift Error:', e);
+            statusEl.textContent = 'An error occurred while sending.';
+            statusEl.classList.add('error');
+            playSound('error');
+        }
+    };
+
+    function itemDisplayForGift(g) {
+        if (g.type === 'gems') return { html: `💎 ${formatNumber(g.amount)}`, cls: 'gems-icon' };
+        let icon = '❓';
+        if (g.type === 'pet') icon = petIcons[g.key] || '🐾';
+        else if (g.type === 'hand') icon = handIcons[g.key] || '👆';
+        else if (g.type === 'limitedPet') icon = (state.limitedPets[g.key] && state.limitedPets[g.key].icon) || '🐾';
+        else if (g.type === 'limitedHand') icon = (state.limitedHands[g.key] && state.limitedHands[g.key].icon) || '👆';
+        const qtyText = g.amount > 1 ? ` x${formatNumber(g.amount)}` : '';
+        return { html: `${icon}${qtyText}`, cls: '' };
+    }
+
+    function renderGiftList() {
+        const list = document.getElementById('giftList');
+        if (!list) return;
+        const ids = Object.keys(giftsCache);
+        if (ids.length === 0) {
+            list.innerHTML = '<div class="gift-empty" id="giftEmptyMsg">No gifts 📭</div>';
+            return;
+        }
+        list.innerHTML = ids.map(id => {
+            const g = giftsCache[id];
+            const disp = itemDisplayForGift(g);
+            const label = g.returned ? `Returned by ${g.from}` : `From: ${g.from}`;
+            return `
+            <div class="gift-card">
+                <div class="gift-collapsed" onclick="toggleGiftCard('${id}')">
+                    <span class="gift-box-icon">${g.returned ? '↩️' : '🎁'}</span>
+                    <span class="gift-hint">${g.returned ? 'Returned gift' : 'New gift'}</span>
+                </div>
+                <div class="gift-expanded hidden" id="gift-expanded-${id}">
+                    <div class="gift-item-icon ${disp.cls}">${disp.html}</div>
+                    <div class="gift-from">${label}</div>
+                    <div class="gift-actions">
+                        <button class="gift-btn accept" onclick="acceptGift('${id}')">✅</button>
+                        <button class="gift-btn decline" onclick="declineGift('${id}')">❌</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    window.toggleGiftCard = function(id) {
+        const el = document.getElementById(`gift-expanded-${id}`);
+        if (el) el.classList.toggle('hidden');
+    };
+
+    window.acceptGift = async function(id) {
+        const g = giftsCache[id];
+        if (!g || !currentUser) return;
+        try {
+            if (g.type === 'gems') {
+                state.gems += g.amount;
+            } else if (g.type === 'pet') {
+                if (state.pets[g.key]) state.pets[g.key].owned += g.amount;
+            } else if (g.type === 'hand') {
+                if (g.key === 'hand') state.handOwned += g.amount;
+                else if (g.key === 'dragonHand') state.dragonHandOwned += g.amount;
+            } else if (g.type === 'limitedPet') {
+                if (!state.limitedPets[g.key]) state.limitedPets[g.key] = { owned: 0 };
+                state.limitedPets[g.key].owned += g.amount;
+            } else if (g.type === 'limitedHand') {
+                if (!state.limitedHands[g.key]) state.limitedHands[g.key] = { owned: 0 };
+                state.limitedHands[g.key].owned += g.amount;
+            }
+            updateUI();
+            saveData();
+
+            await deleteDoc(doc(db, 'mailbox', currentUser.uid, 'gifts', id));
+            playSound('buy');
+        } catch (e) {
+            console.error('Accept Gift Error:', e);
+        }
+    };
+
+    window.declineGift = async function(id) {
+        const g = giftsCache[id];
+        if (!g || !currentUser) return;
+        try {
+            if (!g.returned) {
+                const senderEmail = (g.from || '').toLowerCase();
+                const emailDoc = await getDoc(doc(db, 'usersByEmail', senderEmail));
+                if (emailDoc.exists()) {
+                    const senderUid = emailDoc.data().uid;
+                    await addDoc(collection(db, 'mailbox', senderUid, 'gifts'), {
+                        from: currentUser.email || 'Nieznajomy',
+                        type: g.type,
+                        key: g.key,
+                        amount: g.amount,
+                        returned: true,
+                        timestamp: serverTimestamp()
+                    });
+                }
+            }
+            await deleteDoc(doc(db, 'mailbox', currentUser.uid, 'gifts', id));
+            playSound('error');
+        } catch (e) {
+            console.error('Decline Gift Error:', e);
+        }
+    };
+
+    function listenGifts(uid) {
+        if (giftsUnsub) giftsUnsub();
+        const q = query(collection(db, 'mailbox', uid, 'gifts'), orderBy('timestamp', 'desc'));
+        giftsUnsub = onSnapshot(q, (snap) => {
+            giftsCache = {};
+            snap.forEach(d => { giftsCache[d.id] = d.data(); });
+            renderGiftList();
+        }, (err) => {
+            console.error('Gifts Listen Error:', err);
+        });
+    }
+
+    function stopListeningGifts() {
+        if (giftsUnsub) { giftsUnsub(); giftsUnsub = null; }
+        giftsCache = {};
+        renderGiftList();
+    }
+
+    function setMailboxLocked(locked) {
+        const lockedSend = document.getElementById('mailLockedSend');
+        const sendForm = document.getElementById('mailSendForm');
+        const lockedGifts = document.getElementById('mailLockedGifts');
+        const giftList = document.getElementById('giftList');
+        if (lockedSend) lockedSend.classList.toggle('hidden', !locked);
+        if (sendForm) sendForm.classList.toggle('hidden', locked);
+        if (lockedGifts) lockedGifts.classList.toggle('hidden', !locked);
+        if (giftList) giftList.classList.toggle('hidden', locked);
+    }
+
+    document.getElementById('mainClickBtn').addEventListener('click', (e) => {
+        initAudio();
+        if (state.masteryLevel < 75) {
+            state.manualClicksCount++;
+            checkMasteryProgress();
+        }
+        const power = getClickPower();
+        state.clicks += power;
+        playSound('click');
+        createPopup(e, power);
+        updateUI();
+        saveData();
+    });
+
+    const masteryIcon = document.getElementById('masteryIcon');
+    const masteryTooltip = document.getElementById('masteryTooltip');
+    masteryIcon.addEventListener('mouseenter', () => masteryTooltip.style.display = 'block');
+    masteryIcon.addEventListener('mouseleave', () => masteryTooltip.style.display = 'none');
+    masteryIcon.addEventListener('mousemove', (e) => {
+        masteryTooltip.style.left = (e.clientX + 15) + 'px';
+        masteryTooltip.style.top = (e.clientY + 15) + 'px';
+    });
+
+    const eggMasteryIcon = document.getElementById('eggMasteryIcon');
+    const eggMasteryTooltip = document.getElementById('eggMasteryTooltip');
+    eggMasteryIcon.addEventListener('mouseenter', () => eggMasteryTooltip.style.display = 'block');
+    eggMasteryIcon.addEventListener('mouseleave', () => eggMasteryTooltip.style.display = 'none');
+    eggMasteryIcon.addEventListener('mousemove', (e) => {
+        eggMasteryTooltip.style.left = (e.clientX + 15) + 'px';
+        eggMasteryTooltip.style.top = (e.clientY + 15) + 'px';
+    });
+
+    function updateUI() {
+        document.getElementById('clicks').textContent = formatNumber(state.clicks);
+        document.getElementById('gems').textContent = formatNumber(state.gems);
+        document.getElementById('statPerClick').textContent = formatNumber(getClickPower());
+        document.getElementById('statPerSec').textContent = formatNumber(getTotalCps());
+        document.getElementById('statPetsOwned').textContent = formatNumber(getTotalPetsOwned());
+
+        const isMax = state.masteryLevel >= 75;
+        document.getElementById('masteryBadge').innerHTML = `<span class="pink-text">Lvl ${state.masteryLevel}${isMax ? ' (MAX)' : ''}</span>`;
+        document.getElementById('ttLevel').innerHTML = isMax ? '<span class="pink-text">Level 75 (MAX)</span>' : `<span class="pink-text">Level ${state.masteryLevel}</span>`;
+
+        const isEggMax = state.eggMasteryLevel >= 75;
+        document.getElementById('eggMasteryBadge').innerHTML = `<span class="pink-text">Lvl ${state.eggMasteryLevel}${isEggMax ? ' (MAX)' : ''}</span>`;
+        document.getElementById('eggTtLevel').innerHTML = isEggMax ? '<span class="pink-text">Level 75 (MAX)</span>' : `<span class="pink-text">Level ${state.eggMasteryLevel}</span>`;
+
+        const handCost = getHandCost();
+        document.getElementById('handOwned').textContent = formatNumber(state.handOwned);
+        document.getElementById('handCost').textContent = formatNumber(handCost);
+        document.getElementById('buyHand').disabled = state.clicks < handCost;
+
+        const dragonHandCost = getDragonHandCost();
+        document.getElementById('dragonHandOwned').textContent = formatNumber(state.dragonHandOwned);
+        document.getElementById('dragonHandCost').textContent = formatNumber(dragonHandCost);
+        document.getElementById('buyDragonHand').disabled = state.clicks < dragonHandCost;
+
+        for (let key in state.pets) {
+            document.getElementById(`${key}Owned`).textContent = formatNumber(state.pets[key].owned);
+            if (key !== 'dragon') {
+                const cost = getPetCost(key);
+                document.getElementById(`${key}Cost`).textContent = formatNumber(cost);
+                document.getElementById(`buy${key.charAt(0).toUpperCase() + key.slice(1)}`).disabled = state.clicks < cost;
+            }
+        }
+
+        for (let key in state.eggs) {
+            document.getElementById(`${key}Hatched`).textContent = formatNumber(state.eggs[key].hatched);
+            const cost = getEggCost(key);
+            document.getElementById(`${key}Cost`).textContent = formatNumber(cost);
+            document.getElementById(`buy${key.charAt(0).toUpperCase() + key.slice(1)}`).disabled = (state.clicks < cost) || isEggCooldown;
+        }
+
+        const gemsOwnedHint = document.getElementById('sendGemsOwnedHint');
+        if (gemsOwnedHint) gemsOwnedHint.textContent = formatNumber(state.gems);
+        if (document.getElementById('sendItemKey')) window.updateSendOwnedHint();
+
+        const popBtn = document.getElementById('popupsToggleBtn');
+        if (state.popupsEnabled) {
+            popBtn.textContent = 'ON';
+            popBtn.className = 'toggle-btn on';
+        } else {
+            popBtn.textContent = 'OFF';
+            popBtn.className = 'toggle-btn off';
+        }
+    }
+
+    let saveInProgress = false;
+    let saveQueued = false;
+
+    async function saveData() {
+        if (!currentUser) return;
+
+        if (saveInProgress) {
+            saveQueued = true;
+            return;
+        }
+
+        saveInProgress = true;
+
+        try {
+            const userRef = doc(db, "users", currentUser.uid);
+
+            // Save a snapshot so later changes cannot alter this write.
+            const stateToSave = JSON.parse(JSON.stringify(state));
+
+            await setDoc(userRef, {
+                state: stateToSave
+            }, { merge: true });
+
+        } catch (e) {
+            console.error("Firestore Save Error:", e);
+        } finally {
+            saveInProgress = false;
+
+            if (saveQueued) {
+                saveQueued = false;
+                await saveData();
+            }
+        }
+    }
+
+    async function loadData(user) {
+        if (user) {
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(userRef);
+                if (docSnap.exists() && docSnap.data().state) {
+                    applyLoadedState(docSnap.data().state);
+                } else {
+                    state = getDefaultState();
+                    await saveData();
+                }
+            } catch (e) {
+                console.error("Firestore Load Error:", e);
+                state = getDefaultState();
+            }
+        } else {
+            state = getDefaultState();
+        }
+        updateUI();
+    }
+
+    function applyLoadedState(loaded) {
+        state = getDefaultState();
+        state.clicks = loaded.clicks || 0;
+        state.gems = loaded.gems || 0;
+        state.manualClicksCount = loaded.manualClicksCount || 0;
+        state.masteryLevel = loaded.masteryLevel || 0;
+        state.eggMasteryLevel = loaded.eggMasteryLevel || 0;
+        state.eggProgress = loaded.eggProgress || 0;
+        state.handOwned = loaded.handOwned || 0;
+        state.dragonHandOwned = loaded.dragonHandOwned || 0;
+        state.volume = loaded.volume !== undefined ? loaded.volume : 0.8;
+        state.popupsEnabled = loaded.popupsEnabled !== undefined ? loaded.popupsEnabled : true;
+        if (loaded.pets) {
+            for (let key in loaded.pets) {
+                if (state.pets[key]) state.pets[key].owned = loaded.pets[key].owned || 0;
+            }
+        }
+        if (loaded.eggs) {
+            for (let key in loaded.eggs) {
+                if (state.eggs[key]) state.eggs[key].hatched = loaded.eggs[key].hatched || 0;
+            }
+        }
+        if (loaded.limitedPets) state.limitedPets = loaded.limitedPets;
+        if (loaded.limitedHands) state.limitedHands = loaded.limitedHands;
+        document.getElementById('volumeSlider').value = state.volume;
+    }
+
+    // Save whenever the page becomes hidden (tab switch, refresh, closing, etc.).
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden' && currentUser) {
+            saveData();
+        }
+    });
+
+    // Extra protection for normal page unloading.
+    window.addEventListener('pagehide', () => {
+        if (currentUser) {
+            saveData();
+        }
+    });
+
+    const authBtn = document.getElementById('authBtn');
+    const userInfo = document.getElementById('userInfo');
+
+    onAuthStateChanged(auth, async (user) => {
+        if (currentUser && !user) {
+            await saveData();
+        }
+        currentUser = user;
+        if (user) {
+            const avatar = user.photoURL ? `<img class="user-avatar" src="${user.photoURL}" alt="Avatar">` : '';
+            userInfo.innerHTML = `
+                ${avatar}
+                <span class="user-name">${user.email || user.displayName || 'Logged In'}</span>
+            `;
+            authBtn.textContent = 'Log Out';
+            authBtn.className = 'auth-btn logout';
+            await loadData(user);
+
+            if (user.email) {
+                try {
+                    await setDoc(doc(db, 'usersByEmail', user.email.toLowerCase()), {
+                        uid: user.uid,
+                        email: user.email
+                    }, { merge: true });
+                } catch (e) {
+                    console.error('usersByEmail Write Error:', e);
+                }
+            }
+            setMailboxLocked(false);
+            listenGifts(user.uid);
+        } else {
+            userInfo.innerHTML = `<span class="user-name">Play as Guest</span>`;
+            authBtn.textContent = 'Log in with Google';
+            authBtn.className = 'auth-btn';
+            state = getDefaultState();
+            setMailboxLocked(true);
+            stopListeningGifts();
+            updateUI();
+        }
+    });
+
+    authBtn.addEventListener('click', async () => {
+        if (currentUser) {
+            await saveData();
+            await signOut(auth);
+        } else {
+            signInWithPopup(auth, provider).catch(err => {
+                console.error("Auth Error:", err);
+            });
+        }
+    });
+
+    setInterval(() => {
+        const cps = getTotalCps();
+        if (cps > 0) {
+            state.clicks += cps;
+            updateUI();
+            saveData();
+        }
+    }, 1000);
+
+    // Periodic backup save.
+    setInterval(() => {
+        saveData();
+    }, 5000);
+
+    buildSendCategoryOptions();
+    switchSendTab('item');
+    setMailboxLocked(true);
+
+    updateUI();
+</script>
+</body>
+</html>

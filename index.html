@@ -266,6 +266,39 @@
         .panel-mailbox-gifts .panel-header { background: #f39c12; }
         .panel-mailbox-gifts { background: #ffffff; }
 
+        .panel-shop .panel-header { background: #8e44ad; }
+        .panel-shop { background: #f6eefa; }
+
+        .panel-shop-gamepasses .panel-header { background: #9b59b6; }
+        .panel-shop-gamepasses { background: #ffffff; }
+
+        .panel-shop-other .panel-header { background: #ab7fc4; }
+        .panel-shop-other { background: #ffffff; }
+
+        .panel-limited-hands .panel-content,
+        .panel-limited-pets .panel-content,
+        .panel-limited-eggs .panel-content,
+        .panel-shop-gamepasses .panel-content,
+        .panel-shop-other .panel-content {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .item-cost.gems-cost {
+            color: #0d7ba0;
+            background: #e0f7ff;
+            border-color: rgba(13, 123, 160, 0.18);
+        }
+
+        .buy-btn.owned,
+        .buy-btn.owned:disabled {
+            background: #55efc4;
+            box-shadow: 0 4px 0 #00b894;
+            cursor: default;
+            opacity: 1;
+            color: #024b3a;
+        }
+
         .panel-content {
             padding: 16px 14px;
             display: flex;
@@ -320,6 +353,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.02);
             border: 1px solid rgba(0, 0, 0, 0.04);
             transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -334,6 +368,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            min-width: 0;
         }
 
         .item-icon {
@@ -374,9 +409,13 @@
             font-weight: 700;
         }
 
+        .item-subtext.gems-color {
+            color: #20c7f9;
+        }
+
         .item-meta {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             gap: 6px;
             margin-top: 4px;
         }
@@ -389,6 +428,7 @@
             padding: 3px 9px;
             border-radius: 20px;
             border: 1px solid rgba(71, 71, 135, 0.12);
+            white-space: nowrap;
         }
 
         .item-cost {
@@ -399,6 +439,7 @@
             padding: 3px 9px;
             border-radius: 20px;
             border: 1px solid rgba(181, 117, 10, 0.15);
+            white-space: nowrap;
         }
 
         .mastery-icon-container {
@@ -632,11 +673,6 @@
             font-family: 'Quicksand', sans-serif;
             font-size: 14px;
             text-align: center;
-            outline: none;
-        }
-        
-        .mail-qty-row input:focus {
-            border-color: #27ae60;
         }
 
         .mail-owned-hint {
@@ -972,6 +1008,58 @@
         </div>
     </div>
 
+    <div class="panel panel-shop">
+        <div class="panel-header" onclick="togglePanel('shopContent', 'shopArrow')">
+            <span>Shop</span>
+            <span id="shopArrow">⬇️</span>
+        </div>
+        <div class="panel-content" id="shopContent">
+            <div class="panel panel-shop-gamepasses">
+                <div class="panel-header" onclick="togglePanel('shopGamepassesContent', 'shopGamepassesArrow')">
+                    <span>Gamepasses</span>
+                    <span id="shopGamepassesArrow">⬆️</span>
+                </div>
+                <div class="panel-content hidden" id="shopGamepassesContent">
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-icon">👆</div>
+                            <div class="item-details">
+                                <div class="item-name">x2 Clicks</div>
+                                <div class="item-desc">Doubles Clicks</div>
+                                <div class="item-meta">
+                                    <div class="item-cost gems-cost">Cost 💎 <span id="doubleClicksCost">12K</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="buy-btn" id="buyDoubleClicks" onclick="buyDoubleClicks()">Buy</button>
+                    </div>
+
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-icon">💎</div>
+                            <div class="item-details">
+                                <div class="item-name">x2 Gems</div>
+                                <div class="item-desc">Doubles Gems</div>
+                                <div class="item-meta">
+                                    <div class="item-cost gems-cost">Cost 💎 <span id="doubleGemsCost">18K</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="buy-btn" id="buyDoubleGems" onclick="buyDoubleGems()">Buy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-shop-other">
+                <div class="panel-header" onclick="togglePanel('shopOtherContent', 'shopOtherArrow')">
+                    <span>Other</span>
+                    <span id="shopOtherArrow">⬆️</span>
+                </div>
+                <div class="panel-content hidden" id="shopOtherContent"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="panel panel-settings">
         <div class="panel-header" onclick="togglePanel('settingsContent', 'settingsArrow')">
             <span>Settings</span>
@@ -1077,7 +1165,23 @@
                     <span>Limited Pets</span>
                     <span id="limitedPetsArrow">⬆️</span>
                 </div>
-                <div class="panel-content hidden" id="limitedPetsContent"></div>
+                <div class="panel-content hidden" id="limitedPetsContent">
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-icon">🗿</div>
+                            <div class="item-details">
+                                <div class="item-name">Moai Cat</div>
+                                <div class="item-desc">Available For Limited Time</div>
+                                <div class="item-subtext gems-color">💎 1/s</div>
+                                <div class="item-meta">
+                                    <div class="item-owned">Owned: <span id="moaiCatOwned">0</span></div>
+                                    <div class="item-cost">Cost 👆 <span id="moaiCatCost">20M</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="buy-btn" id="buyMoaiCat" onclick="buyMoaiCat()">Buy</button>
+                    </div>
+                </div>
             </div>
 
             <div class="panel panel-limited-eggs">
@@ -1149,12 +1253,20 @@
             eggs: {
                 basicEgg: { hatched: 0 }
             },
-            limitedPets: {},
+            limitedPets: { moaiCat: { owned: 0, gps: 1, name: 'Moai Cat', icon: '🗿' } },
             limitedHands: {},
+            gamepasses: { doubleClicks: false, doubleGems: false },
             volume: 0.8,
-            popupsEnabled: true
+            popupsEnabled: true,
+            gemBonusClickCount: 0
         };
     }
+
+    const GEM_BONUS_CLICKS_REQUIRED = 60;
+    const GEM_BONUS_GAIN = 1;
+    const GEM_COUNTER_COLOR = '#20c7f9';
+    const GAMEPASS_DOUBLE_CLICKS_COST = 12000;
+    const GAMEPASS_DOUBLE_GEMS_COST = 18000;
 
     let state = getDefaultState();
     let isEggCooldown = false;
@@ -1253,7 +1365,9 @@
     }
 
     function getClickPower() {
-        return (1 + (state.handOwned * 1) + (state.dragonHandOwned * 5)) * getMasteryMultiplier();
+        let power = (1 + (state.handOwned * 1) + (state.dragonHandOwned * 5)) * getMasteryMultiplier();
+        if (state.gamepasses.doubleClicks) power *= 2;
+        return power;
     }
 
     function getHandCost() {
@@ -1276,12 +1390,27 @@
         return Math.floor(baseCost * Math.pow(1.15, state.eggs[eggKey].hatched));
     }
 
+    function getMoaiCatCost() {
+        return Math.floor(20000000 * Math.pow(1.15, state.limitedPets.moaiCat.owned));
+    }
+
     function getTotalCps() {
         let baseCps = 0;
         for (let key in state.pets) {
             baseCps += state.pets[key].owned * state.pets[key].cps;
         }
-        return baseCps * getMasteryMultiplier();
+        let total = baseCps * getMasteryMultiplier();
+        if (state.gamepasses.doubleClicks) total *= 2;
+        return total;
+    }
+
+    function getTotalGps() {
+        let baseGps = 0;
+        for (let key in state.limitedPets) {
+            if (state.limitedPets[key].gps) baseGps += state.limitedPets[key].owned * state.limitedPets[key].gps;
+        }
+        if (state.gamepasses.doubleGems) baseGps *= 2;
+        return baseGps;
     }
 
     function getTotalPetsOwned() {
@@ -1290,11 +1419,12 @@
         return total;
     }
 
-    function createPopup(e, text) {
+    function createPopup(e, text, color = null) {
         if (!state.popupsEnabled) return;
         const popup = document.createElement('div');
         popup.className = 'click-popup';
         popup.textContent = `+${formatNumber(text)}`;
+        if (color) popup.style.color = color;
         const rect = document.getElementById('clickArea').getBoundingClientRect();
         let x = e.clientX ? (e.clientX - rect.left) : (rect.width / 2);
         let y = e.clientY ? (e.clientY - rect.top) : (rect.height / 2);
@@ -1362,6 +1492,48 @@
         if (state.clicks >= cost) {
             state.clicks -= cost;
             state.pets[petKey].owned++;
+            playSound('buy');
+            saveData();
+        } else {
+            playSound('error');
+        }
+        updateUI();
+    };
+
+    window.buyMoaiCat = function() {
+        initAudio();
+        const cost = getMoaiCatCost();
+        if (state.clicks >= cost) {
+            state.clicks -= cost;
+            state.limitedPets.moaiCat.owned++;
+            playSound('buy');
+            saveData();
+        } else {
+            playSound('error');
+        }
+        updateUI();
+    };
+
+    window.buyDoubleClicks = function() {
+        initAudio();
+        if (state.gamepasses.doubleClicks) return;
+        if (state.gems >= GAMEPASS_DOUBLE_CLICKS_COST) {
+            state.gems -= GAMEPASS_DOUBLE_CLICKS_COST;
+            state.gamepasses.doubleClicks = true;
+            playSound('buy');
+            saveData();
+        } else {
+            playSound('error');
+        }
+        updateUI();
+    };
+
+    window.buyDoubleGems = function() {
+        initAudio();
+        if (state.gamepasses.doubleGems) return;
+        if (state.gems >= GAMEPASS_DOUBLE_GEMS_COST) {
+            state.gems -= GAMEPASS_DOUBLE_GEMS_COST;
+            state.gamepasses.doubleGems = true;
             playSound('buy');
             saveData();
         } else {
@@ -1807,6 +1979,15 @@
         state.clicks += power;
         playSound('click');
         createPopup(e, power);
+
+        state.gemBonusClickCount++;
+        if (state.gemBonusClickCount >= GEM_BONUS_CLICKS_REQUIRED) {
+            state.gemBonusClickCount -= GEM_BONUS_CLICKS_REQUIRED;
+            const gemGain = state.gamepasses.doubleGems ? GEM_BONUS_GAIN * 2 : GEM_BONUS_GAIN;
+            state.gems += gemGain;
+            createPopup(e, gemGain, GEM_COUNTER_COLOR);
+        }
+
         updateUI();
         saveData();
     });
@@ -1828,6 +2009,20 @@
         eggMasteryTooltip.style.left = (e.clientX + 15) + 'px';
         eggMasteryTooltip.style.top = (e.clientY + 15) + 'px';
     });
+
+    function updateGamepassButton(btnId, owned, cost) {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        if (owned) {
+            btn.textContent = 'Owned ✅';
+            btn.disabled = true;
+            btn.classList.add('owned');
+        } else {
+            btn.textContent = 'Buy';
+            btn.classList.remove('owned');
+            btn.disabled = state.gems < cost;
+        }
+    }
 
     function updateUI() {
         document.getElementById('clicks').textContent = formatNumber(state.clicks);
@@ -1869,6 +2064,14 @@
             document.getElementById(`${key}Cost`).textContent = formatNumber(cost);
             document.getElementById(`buy${key.charAt(0).toUpperCase() + key.slice(1)}`).disabled = (state.clicks < cost) || isEggCooldown;
         }
+
+        const moaiCatCost = getMoaiCatCost();
+        document.getElementById('moaiCatOwned').textContent = formatNumber(state.limitedPets.moaiCat.owned);
+        document.getElementById('moaiCatCost').textContent = formatNumber(moaiCatCost);
+        document.getElementById('buyMoaiCat').disabled = state.clicks < moaiCatCost;
+
+        updateGamepassButton('buyDoubleClicks', state.gamepasses.doubleClicks, GAMEPASS_DOUBLE_CLICKS_COST);
+        updateGamepassButton('buyDoubleGems', state.gamepasses.doubleGems, GAMEPASS_DOUBLE_GEMS_COST);
 
         if (document.getElementById('sendItemKey')) window.updateSendOwnedHint();
 
@@ -1943,6 +2146,7 @@
         state.clicks = loaded.clicks || 0;
         state.gems = loaded.gems || 0;
         state.manualClicksCount = loaded.manualClicksCount || 0;
+        state.gemBonusClickCount = loaded.gemBonusClickCount || 0;
         state.masteryLevel = loaded.masteryLevel || 0;
         state.eggMasteryLevel = loaded.eggMasteryLevel || 0;
         state.eggProgress = loaded.eggProgress || 0;
@@ -1960,8 +2164,22 @@
                 if (state.eggs[key]) state.eggs[key].hatched = loaded.eggs[key].hatched || 0;
             }
         }
-        if (loaded.limitedPets) state.limitedPets = loaded.limitedPets;
-        if (loaded.limitedHands) state.limitedHands = loaded.limitedHands;
+        if (loaded.limitedPets) {
+            for (let key in loaded.limitedPets) {
+                if (!state.limitedPets[key]) state.limitedPets[key] = { owned: 0 };
+                state.limitedPets[key].owned = loaded.limitedPets[key].owned || 0;
+            }
+        }
+        if (loaded.limitedHands) {
+            for (let key in loaded.limitedHands) {
+                if (!state.limitedHands[key]) state.limitedHands[key] = { owned: 0 };
+                state.limitedHands[key].owned = loaded.limitedHands[key].owned || 0;
+            }
+        }
+        if (loaded.gamepasses) {
+            state.gamepasses.doubleClicks = !!loaded.gamepasses.doubleClicks;
+            state.gamepasses.doubleGems = !!loaded.gamepasses.doubleGems;
+        }
         document.getElementById('volumeSlider').value = state.volume;
     }
 
@@ -2033,8 +2251,10 @@
 
     setInterval(() => {
         const cps = getTotalCps();
-        if (cps > 0) {
-            state.clicks += cps;
+        const gps = getTotalGps();
+        if (cps > 0) state.clicks += cps;
+        if (gps > 0) state.gems += gps;
+        if (cps > 0 || gps > 0) {
             updateUI();
             saveData();
         }
